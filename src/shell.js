@@ -18,15 +18,19 @@
               const mtime = response.responseText;
               if (mtime !== prevMtime) {
                   prevMtime = mtime;
+                  // NOTE: May need to clearInterval and await
                   reloadScript();
               }
           }
       });
     }, POLL_INTERVAL);
 
-    function reloadScript() {
+    async function reloadScript() {
+      // The result of the eval might be a promise
+      prevResult = await prevResult;
       if (typeof prevResult === 'function') {
-          prevResult();
+          // The result of the eval might be a function that returns a promise
+          await prevResult();
           prevResult = null;
       }
 
