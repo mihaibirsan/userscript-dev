@@ -25,10 +25,18 @@ app.get(`/${encodeURIComponent(TARGET_FILENAME)}`, function (req, res) {
   // and the body from the shell file
   const script = fs.readFileSync(WATCHED_FILE, 'utf8');
   const shell = fs.readFileSync(__dirname + '/shell.js', 'utf8');
-  const header = script.split('// ==/UserScript==')[0] + '// ==/UserScript==';
+  let header = script.split('// ==/UserScript==')[0];
+  // Grant GM_xmlhttpRequest if not present
+  if (!header.match(/\/\/\s*@grant\s*GM_xmlhttpRequest/)) {
+    // Remove conflicting @grant none
+    if (header.match(/\/\/\s*@grant\s*none\s*/)) {
+      header = header.replace(/\/\/\s*@grant\s*none\s*/, '');
+    }
+    header += '// @grant GM_xmlhttpRequest\n';
+  }
   const body = shell;
   res.set('Content-Type', 'application/javascript');
-  res.send(header + body);
+  res.send(header + '// ==/UserScript==\n' + body);
 })
 
 // NOTE: Consider sending the mtime as a response header

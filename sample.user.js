@@ -6,7 +6,7 @@
 // @author       Mihai Bîrsan
 // @match        http://localhost:3000/
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
-// @grant        GM_xmlhttpRequest
+// @grant        none
 // ==/UserScript==
 
 (function() {
@@ -15,7 +15,7 @@
     const el = document.createElement('div');
     el.innerHTML = `
       ${new Date()} - sample.user.js<br>
-      2 - increment and save to test - sample.user.js
+      1 - increment and save to test - sample.user.js
     `;
 
     document.body.prepend(el);
