@@ -14,13 +14,33 @@
 
     console.log('Userscript Dev Shell');
 
-    GM_xmlhttpRequest({
-        method: "GET",
-        url: "http://localhost:3000/script.user.js",
-        onload: function(response) {
-            eval(response.responseText);
-        }
-    });
+    const SHELL_HOST = 'http://localhost:3000';
+    const POLL_INTERVAL = 667;
+    let prevMtime = null;
+
+    setInterval(function() {
+      GM_xmlhttpRequest({
+          method: "GET",
+          url: `${SHELL_HOST}/mtime`,
+          onload: function(response) {
+              const mtime = response.responseText;
+              if (mtime !== prevMtime) {
+                  prevMtime = mtime;
+                  reloadScript();
+              }
+          }
+      });
+    }, POLL_INTERVAL);
+
+    function reloadScript() {
+      GM_xmlhttpRequest({
+          method: "GET",
+          url: `${SHELL_HOST}/script.user.js`,
+          onload: function(response) {
+              eval(response.responseText);
+          }
+      });
+    }
 
     // Your code here...
 })();
