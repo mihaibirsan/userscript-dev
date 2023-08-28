@@ -2,22 +2,35 @@ const fs = require('fs');
 const express = require('express')
 const opener = require("opener");
 
+const TARGET_FILENAME = process.argv[2];
+const WATCHED_FILE = process.cwd() + '/' + TARGET_FILENAME;
+
+if (!fs.existsSync(WATCHED_FILE)) {
+  console.log('File not found: ' + WATCHED_FILE);
+  process.exit(1);
+}
+
 const app = express()
 
-const WATCHED_FILE = __dirname + '/script.user.js';
-
-opener("http://localhost:3000/shell.user.js");
+opener(`http://localhost:3000/${TARGET_FILENAME}`);
 
 app.get('/', function (req, res) {
   res.send('Hello World!')
 })
 
-app.get('/shell.user.js', function (req, res) {
-  res.sendFile(__dirname + '/shell.user.js')
+app.get(`/${TARGET_FILENAME}`, function (req, res) {
+  // Serve the userscript header from the original file
+  // and the body from the shell file
+  const script = fs.readFileSync(WATCHED_FILE, 'utf8');
+  const shell = fs.readFileSync(__dirname + '/shell.js', 'utf8');
+  const header = script.split('// ==/UserScript==')[0] + '// ==/UserScript==';
+  const body = shell;
+  res.set('Content-Type', 'application/javascript');
+  res.send(header + body);
 })
 
 // NOTE: Consider sending the mtime as a response header
-app.get('/script.user.js', function (req, res) {
+app.get('/userscript.js', function (req, res) {
   res.sendFile(WATCHED_FILE);
 })
 
