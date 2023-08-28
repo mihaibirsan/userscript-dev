@@ -14,13 +14,13 @@ if (!fs.existsSync(WATCHED_FILE)) {
 
 const app = express()
 
-opener(`http://localhost:3000/${TARGET_FILENAME}`);
+opener(`http://localhost:3000/${encodeURIComponent(TARGET_FILENAME)}`);
 
 app.get('/', function (req, res) {
   res.send('Hello World!')
 })
 
-app.get(`/${TARGET_FILENAME}`, function (req, res) {
+app.get(`/${encodeURIComponent(TARGET_FILENAME)}`, function (req, res) {
   // Serve the userscript header from the original file
   // and the body from the shell file
   const script = fs.readFileSync(WATCHED_FILE, 'utf8');
