@@ -17,6 +17,7 @@
     const SHELL_HOST = 'http://localhost:3000';
     const POLL_INTERVAL = 667;
     let prevMtime = null;
+    let prevResult = null;
 
     setInterval(function() {
       GM_xmlhttpRequest({
@@ -33,11 +34,16 @@
     }, POLL_INTERVAL);
 
     function reloadScript() {
+      if (typeof prevResult === 'function') {
+          prevResult();
+          prevResult = null;
+      }
+
       GM_xmlhttpRequest({
           method: "GET",
           url: `${SHELL_HOST}/script.user.js`,
           onload: function(response) {
-              eval(response.responseText);
+              prevResult = eval(response.responseText);
           }
       });
     }
